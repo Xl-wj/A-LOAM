@@ -36,6 +36,8 @@ catkin_package(
   INCLUDE_DIRS include
 )
 
+add_executable(aimageProjection src/imageProjection.cpp)
+target_link_libraries(aimageProjection ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable(ascanRegistration src/scanRegistration.cpp)
 target_link_libraries(ascanRegistration ${catkin_LIBRARIES} ${PCL_LIBRARIES})
