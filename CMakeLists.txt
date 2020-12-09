@@ -5,6 +5,13 @@ set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O2")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O2")
+
+#PointMatcher
+set(pointmatcher_dir /home/xl/projects/ws_aloam/src/A-LOAM/cmake/PointMatcher.cmake)
+include(${pointmatcher_dir})
+
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
@@ -51,6 +58,9 @@ target_link_libraries(alaserMapping ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${CERES
 add_executable(kittiHelper src/kittiHelper.cpp)
 target_link_libraries(kittiHelper ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
+add_executable(transformFusion src/transformFusion.cpp)
+target_link_libraries(transformFusion ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
-
+add_executable(lidarMapLocalization src/lidarMapLocalization.cpp)
+target_link_libraries(lidarMapLocalization ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${libpointmatcher_LIBRARIES})
 

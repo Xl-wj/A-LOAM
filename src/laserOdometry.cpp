@@ -183,8 +183,7 @@ void laserCloudFullResHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloud
     mBuf.unlock();
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     ros::init(argc, argv, "laserOdometry");
     ros::NodeHandle nh;
 
@@ -217,26 +216,20 @@ int main(int argc, char **argv)
     int frameCount = 0;
     ros::Rate rate(100);
 
-    while (ros::ok())
-    {
+    while (ros::ok()) {
         ros::spinOnce();
 
-        if (!cornerSharpBuf.empty() && !cornerLessSharpBuf.empty() &&
-            !surfFlatBuf.empty() && !surfLessFlatBuf.empty() &&
-            !fullPointsBuf.empty())
-        {
+        if (!cornerSharpBuf.empty() && !cornerLessSharpBuf.empty() && !surfFlatBuf.empty() && !surfLessFlatBuf.empty() && !fullPointsBuf.empty()) {
             timeCornerPointsSharp = cornerSharpBuf.front()->header.stamp.toSec();
             timeCornerPointsLessSharp = cornerLessSharpBuf.front()->header.stamp.toSec();
             timeSurfPointsFlat = surfFlatBuf.front()->header.stamp.toSec();
             timeSurfPointsLessFlat = surfLessFlatBuf.front()->header.stamp.toSec();
             timeLaserCloudFullRes = fullPointsBuf.front()->header.stamp.toSec();
 
-            if (timeCornerPointsSharp != timeLaserCloudFullRes ||
-                timeCornerPointsLessSharp != timeLaserCloudFullRes ||
-                timeSurfPointsFlat != timeLaserCloudFullRes ||
-                timeSurfPointsLessFlat != timeLaserCloudFullRes)
-            {
-                printf("unsync messeage!");
+            if (timeCornerPointsSharp != timeLaserCloudFullRes || timeCornerPointsLessSharp != timeLaserCloudFullRes ||
+                timeSurfPointsFlat != timeLaserCloudFullRes || timeSurfPointsLessFlat != timeLaserCloudFullRes) {
+                printf("unsync messeage(scan-to-scan): time timeLaserCloudFullRes %f timeCornerPointsSharp %f timeCornerPointsLessSharp %f timeSurfPointsFlat %f timeSurfPointsLessFlat %f \n",
+                       timeLaserCloudFullRes, timeCornerPointsSharp, timeCornerPointsLessSharp, timeSurfPointsFlat, timeSurfPointsLessFlat);
                 ROS_BREAK();
             }
 
@@ -264,19 +257,15 @@ int main(int argc, char **argv)
 
             TicToc t_whole;
             // initializing
-            if (!systemInited)
-            {
+            if (!systemInited) {
                 systemInited = true;
                 std::cout << "Initialization finished \n";
-            }
-            else
-            {
+            } else {
                 int cornerPointsSharpNum = cornerPointsSharp->points.size();
                 int surfPointsFlatNum = surfPointsFlat->points.size();
 
                 TicToc t_opt;
-                for (size_t opti_counter = 0; opti_counter < 2; ++opti_counter)
-                {
+                for (size_t opti_counter = 0; opti_counter < 2; ++opti_counter) {
                     corner_correspondence = 0;
                     plane_correspondence = 0;
 
