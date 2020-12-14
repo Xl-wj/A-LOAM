@@ -14,13 +14,9 @@
 
     <node pkg="aloam_velodyne" type="aimageProjection" name="aimageProjection" output="screen" />
 
-    <node pkg="aloam_velodyne" type="ascanRegistration" name="ascanRegistration" output="screen" />
+    <node pkg="aloam_velodyne" type="scanPmOdometry" name="scanPmOdometry" output="screen" />
 
-    <node pkg="aloam_velodyne" type="alaserOdometry" name="alaserOdometry" output="screen" />
-
-    <node pkg="aloam_velodyne" type="alaserMapping" name="alaserMapping" output="screen" />
-
-    <!-- node pkg="aloam_velodyne" type="lidarMapLocalization" name="lidarMapLocalization" output="screen" / -->
+    <node pkg="aloam_velodyne" type="lidarMapLocalization" name="lidarMapLocalization" output="screen" />
 
     <node pkg="aloam_velodyne" type="transformFusion" name="transformFusion" output="screen" />
 

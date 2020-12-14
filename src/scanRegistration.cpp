@@ -113,12 +113,14 @@ void removeClosedPointCloud(const pcl::PointCloud<PointT> &cloud_in,
 
 void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
 {
+    static double last_scan_time = -100.0;
     if (!systemInited)
     { 
         systemInitCount++;
         if (systemInitCount >= systemDelay)
         {
             systemInited = true;
+            last_scan_time = laserCloudMsg->header.stamp.toSec();
         }
         else
             return;
@@ -128,6 +130,12 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
     TicToc t_prepare;
     std::vector<int> scanStartInd(N_SCANS, 0);
     std::vector<int> scanEndInd(N_SCANS, 0);
+
+    if(systemInited && (laserCloudMsg->header.stamp.toSec() < last_scan_time)) {
+        ROS_WARN("------- LIDAR DATA STREAM LOSS ! (Reverse moment) ----------");
+        return;
+    }
+    last_scan_time = laserCloudMsg->header.stamp.toSec();
 
     pcl::PointCloud<pcl::PointXYZ> laserCloudIn;
     pcl::fromROSMsg(*laserCloudMsg, laserCloudIn);
@@ -458,9 +466,11 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
         ROS_WARN("scan registration process over 100ms");
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     ros::init(argc, argv, "scanRegistration");
+
+    ROS_INFO("\033[1;32m---->\033[0m Scan Registration Started.");
+
     ros::NodeHandle nh;
 
     nh.param<int>("scan_line", N_SCANS, 16);
@@ -469,8 +479,7 @@ int main(int argc, char **argv)
 
     printf("scan line number %d \n", N_SCANS);
 
-    if(N_SCANS != 16 && N_SCANS != 32 && N_SCANS != 64)
-    {
+    if(N_SCANS != 16 && N_SCANS != 32 && N_SCANS != 64) {
         printf("only support velodyne with 16, 32 or 64 scan line!");
         return 0;
     }

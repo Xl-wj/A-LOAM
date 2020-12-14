@@ -31,11 +31,11 @@ private:
 
 public:
     TransformFusion() {
-      pubFusionLocalization = nh.advertise<nav_msgs::Odometry> ("/fusion_localization", 20);
-      pubLocalizationPath = nh.advertise<nav_msgs::Path>("/localization_path", 1);
+      pubFusionLocalization = nh.advertise<nav_msgs::Odometry> ("/fusion_localization", 100);
+      pubLocalizationPath = nh.advertise<nav_msgs::Path>("/localization_path", 100);
 
-      subLaserOdometry = nh.subscribe<nav_msgs::Odometry>("/laser_odom_to_init", 20, &TransformFusion::laserOdometryHandler, this);
-      subMapLocalization = nh.subscribe<nav_msgs::Odometry>("/map_localization", 20, &TransformFusion::mapLocalizationHandler, this);
+      subLaserOdometry = nh.subscribe<nav_msgs::Odometry>("/laser_odom_to_init", 100, &TransformFusion::laserOdometryHandler, this);
+      subMapLocalization = nh.subscribe<nav_msgs::Odometry>("/map_localization", 100, &TransformFusion::mapLocalizationHandler, this);
     }
 
     size_t hashKeyOdometry(const nav_msgs::Odometry& laserOdometry) {
@@ -54,6 +54,7 @@ public:
     }
 
     void laserOdometryHandler(const nav_msgs::Odometry::ConstPtr& laserOdometry) {
+
       std::lock_guard<std::mutex> lock1(odotx);
       std::lock_guard<std::mutex> lock2(maptx);
 

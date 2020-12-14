@@ -3,10 +3,10 @@ project(aloam_velodyne)
 
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_FLAGS "-std=c++11")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
+#set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O2")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O2")
 
 #PointMatcher
 set(pointmatcher_dir /home/xl/projects/ws_aloam/src/A-LOAM/cmake/PointMatcher.cmake)
@@ -50,7 +50,7 @@ add_executable(ascanRegistration src/scanRegistration.cpp)
 target_link_libraries(ascanRegistration ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 add_executable(alaserOdometry src/laserOdometry.cpp)
-target_link_libraries(alaserOdometry ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${CERES_LIBRARIES})
+target_link_libraries(alaserOdometry ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${CERES_LIBRARIES} ${libpointmatcher_LIBRARIES})
 
 add_executable(alaserMapping src/laserMapping.cpp)
 target_link_libraries(alaserMapping ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${CERES_LIBRARIES})
@@ -64,3 +64,5 @@ target_link_libraries(transformFusion ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 add_executable(lidarMapLocalization src/lidarMapLocalization.cpp)
 target_link_libraries(lidarMapLocalization ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${libpointmatcher_LIBRARIES})
 
+add_executable(scanPmOdometry src/scanPmOdometry.cpp)
+target_link_libraries(scanPmOdometry ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${libpointmatcher_LIBRARIES})

@@ -55,7 +55,8 @@
 #include "aloam_velodyne/common.h"
 #include "aloam_velodyne/tic_toc.h"
 #include "lidarFactor.hpp"
-
+#include "pm_utility.h"
+#include "tf_common.h"
 #define DISTORTION 0
 
 
@@ -73,6 +74,13 @@ double timeCornerPointsLessSharp = 0;
 double timeSurfPointsFlat = 0;
 double timeSurfPointsLessFlat = 0;
 double timeLaserCloudFullRes = 0;
+
+double currOdometryTime = -1.0;
+double lastOdometryTime = -1.0;
+double currDurationTime = -1.0;
+double lastDurationTime = -1.0;
+
+Eigen::Vector3d xyz_velocity;
 
 pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr kdtreeCornerLast(new pcl::KdTreeFLANN<pcl::PointXYZI>());
 pcl::KdTreeFLANN<pcl::PointXYZI>::Ptr kdtreeSurfLast(new pcl::KdTreeFLANN<pcl::PointXYZI>());
@@ -255,6 +263,8 @@ int main(int argc, char **argv) {
             fullPointsBuf.pop();
             mBuf.unlock();
 
+            currOdometryTime = timeCornerPointsLessSharp;
+
             TicToc t_whole;
             // initializing
             if (!systemInited) {
@@ -263,6 +273,15 @@ int main(int argc, char **argv) {
             } else {
                 int cornerPointsSharpNum = cornerPointsSharp->points.size();
                 int surfPointsFlatNum = surfPointsFlat->points.size();
+
+                currDurationTime = currOdometryTime - lastOdometryTime;
+                if(lastOdometryTime > 0.0 && currDurationTime > 0.3) {
+                    std::cout << "currDurationTime > 0.3, init xyz using last velocity \n";
+                    Eigen::Vector3d xyz_init = xyz_velocity * currDurationTime;
+                    para_t[0] = xyz_init[0];
+                    para_t[1] = xyz_init[1];
+                    para_t[2] = xyz_init[2];
+                }
 
                 TicToc t_opt;
                 for (size_t opti_counter = 0; opti_counter < 2; ++opti_counter) {
@@ -492,11 +511,19 @@ int main(int argc, char **argv) {
 
                 t_w_curr = t_w_curr + q_w_curr * t_last_curr;
                 q_w_curr = q_w_curr * q_last_curr;
+
+                if(lastOdometryTime > 0.0) {
+                    xyz_velocity = (q_w_curr * t_last_curr) / currDurationTime;
+                }
+                lastOdometryTime = currOdometryTime;
+                lastDurationTime = currDurationTime;
             }
 
             TicToc t_pub;
 
             // publish odometry
+            static nav_msgs::Odometry last_laserOdometry;
+            static bool debug = false;
             nav_msgs::Odometry laserOdometry;
             laserOdometry.header.frame_id = "/camera_init";
             laserOdometry.child_frame_id = "/laser_odom";
@@ -510,6 +537,30 @@ int main(int argc, char **argv) {
             laserOdometry.pose.pose.position.z = t_w_curr.z();
             pubLaserOdometry.publish(laserOdometry);
 
+            //// TODO: for visualization to find problem
+            if(debug && fabs(laserOdometry.header.stamp.toSec() - 1606803969.776459) < 6.0) {
+
+              pcl::PointCloud<PointType> lastCloud = *laserCloudCornerLast;
+              lastCloud += *laserCloudSurfLast;
+              DP lastPm = convertPCL2PM(lastCloud);
+              lastPm.descriptors.fill(10.0);
+
+              pcl::PointCloud<PointType> currentCloud = *cornerPointsLessSharp;
+              currentCloud += *surfPointsLessFlat;
+              DP currentPm = convertPCL2PM(currentCloud);
+              currentPm.descriptors.fill(150.0);
+
+              // Apply the transformation to features
+              Eigen::Affine3f tf = odomToAffine(last_laserOdometry).inverse() * odomToAffine(laserOdometry);
+              currentPm.features = tf.matrix() * currentPm.features;
+              lastPm.concatenate(currentPm);
+
+              std::string debug_file = "/home/xl/ht_test/debug/" + std::to_string(timeSurfPointsLessFlat) + ".pcd";
+              lastPm.save(debug_file);
+              ROS_WARN("finished to save ! %s", debug_file.c_str());
+            }
+            last_laserOdometry = laserOdometry;
+            debug = true;
             geometry_msgs::PoseStamped laserPose;
             laserPose.header = laserOdometry.header;
             laserPose.pose = laserOdometry.pose.pose;

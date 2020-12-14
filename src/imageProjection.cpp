@@ -170,6 +170,13 @@ public:
     }
     
     void cloudHandler(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg){
+        static double last_scan_time = -100.0;
+        if(laserCloudMsg->header.stamp.toSec() < last_scan_time) {
+            ROS_WARN("------- LIDAR DATA STREAM LOSS ! (Reverse moment) ----------");
+            return;
+        }
+        last_scan_time = laserCloudMsg->header.stamp.toSec();
+
         // 1. Convert ros message to pcl point cloud
         copyPointCloud(laserCloudMsg);
 
