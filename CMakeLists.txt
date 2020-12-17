@@ -3,7 +3,6 @@ project(aloam_velodyne)
 
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_FLAGS "-std=c++11")
-#set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O2")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O2")
@@ -11,6 +10,12 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -O2")
 #PointMatcher
 set(pointmatcher_dir /home/xl/projects/ws_aloam/src/A-LOAM/cmake/PointMatcher.cmake)
 include(${pointmatcher_dir})
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+## glog
+include(${CMAKE_SOURCE_DIR}/A-LOAM/cmake/FindGlog.cmake)
+#find_package(Glog REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
@@ -66,3 +71,9 @@ target_link_libraries(lidarMapLocalization ${catkin_LIBRARIES} ${PCL_LIBRARIES} 
 
 add_executable(scanPmOdometry src/scanPmOdometry.cpp)
 target_link_libraries(scanPmOdometry ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${libpointmatcher_LIBRARIES})
+
+add_executable(test_msg_buf_register test/test_msg_buf_register.cpp)
+target_link_libraries(test_msg_buf_register ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(scan_2_scan src/scan_2_scan.cpp)
+target_link_libraries(scan_2_scan ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${CERES_LIBRARIES} ${libpointmatcher_LIBRARIES})

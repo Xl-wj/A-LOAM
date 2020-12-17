@@ -535,7 +535,7 @@ int main(int argc, char** argv) {
 
   ROS_INFO("\033[1;32m---->\033[0m Map Localization Started.");
 
-  ros::Rate rate(1);
+  ros::Rate rate(2);
 
   while (ros::ok()) {
     ros::spinOnce();

@@ -8,18 +8,18 @@
     <!-- remove too closed points -->
     <param name="minimum_range" type="double" value="0.3"/>
 
-
     <param name="mapping_line_resolution" type="double" value="0.2"/>
     <param name="mapping_plane_resolution" type="double" value="0.4"/>
     <param name="globalMapFile" type="string" value="/home/xl/Desktop/ht_office/opt/feature_map.pcd"/>
 
-    <param name="init_x" type="double" value="17.8"/>
-    <param name="init_y" type="double" value="43.18"/>
-    <param name="init_z" type="double" value="0.046"/>
+    <param name="init_x" type="double" value="109.563484192"/>
+    <param name="init_y" type="double" value="37.4764251709"/>
+    <param name="init_z" type="double" value="-0.975196838379"/>
 
-    <param name="init_roll" type="double" value="0.0"/>
-    <param name="init_pitch" type="double" value="0.0"/>
-    <param name="init_yaw" type="double" value="-0.3"/>
+    <param name="init_roll" type="double" value="0.012256983667612076"/>
+    <param name="init_pitch" type="double" value="0.011947467923164368"/>
+    <param name="init_yaw" type="double" value="-0.011905807070434093"/>
+
 
     <node pkg="aloam_velodyne" type="aimageProjection" name="aimageProjection" output="screen" />
 

@@ -89,6 +89,9 @@ public:
       fusionLocalization.pose.pose.position.z = z;
       fusionLocalization.pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(roll, pitch, yaw);
 
+      fusionLocalization.pose.covariance.at(0) = roll;
+      fusionLocalization.pose.covariance.at(1) = pitch;
+      fusionLocalization.pose.covariance.at(2) = yaw;
       pubFusionLocalization.publish(fusionLocalization);
 
       // publish path
